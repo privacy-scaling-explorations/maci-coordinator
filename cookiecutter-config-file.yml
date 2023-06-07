@@ -1,0 +1,15 @@
+# This project was generated using a Cookiecutter template:
+#       https://github.com/notsatan/go-template
+
+cookiecutter_inputs:
+  project_name: "maci-coordinator"
+  go_module_path: "github.com/privacy-scaling-explorations/maci-coordinator"
+  license_owner: "PSE"
+  base_branch: "main"
+  contact_email: "paik@a30a.dev"
+  project_description: "MaciCoordinator is a Go application created using https://github.com/notsatan/go-template"
+  github_specific_features: "y"
+  use_codecov: "y"
+  use_precommit: "y"
+  go_version: "1.18"
+  license: "MIT"
