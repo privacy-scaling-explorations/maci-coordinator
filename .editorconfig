@@ -15,6 +15,7 @@ indent_style = tab  # older versions of GNU Make do not work well with spaces
 
 [*.{yaml,yml}]
 indent_size = 2
+indent_style = space
 
 [*.{md,rst}]
 trim_trailing_whitespace = false

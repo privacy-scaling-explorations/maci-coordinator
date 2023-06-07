@@ -41,7 +41,6 @@ tmp
 ./coverage/
 
 build-script.sh
-codecov.yml
 .editorconfig
 .golangci.yml
 .goreleaser.yml

@@ -9,7 +9,7 @@ cookiecutter_inputs:
   contact_email: "paik@a30a.dev"
   project_description: "MaciCoordinator is a Go application created using https://github.com/notsatan/go-template"
   github_specific_features: "y"
-  use_codecov: "y"
+  use_codecov: "n"
   use_precommit: "y"
   go_version: "1.18"
   license: "MIT"
