@@ -8,14 +8,20 @@ import (
 )
 
 func main() {
-	fmt.Printf("Running project: `%s`\n", src.ProjectName())
-
 	// These functions demonstrate two separate checks to detect if the code is being
 	// run inside a docker container in debug mode, or production mode!
 	//
 	// Note: Valid only for docker containers generated using the Makefile command
 	firstCheck()
 	secondCheck()
+
+	r := src.NewRouter()
+	r.LoadHTMLFiles("demo/api_demo.html")
+
+	// listen and serve on localhost:8080
+	if err := r.Run(); err != nil {
+		panic("Failed to run API server")
+	}
 }
 
 func firstCheck() bool {

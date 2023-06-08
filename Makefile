@@ -70,7 +70,7 @@ lint:
 # No `help` message for this command - designed to be consumed internally
 .PHONY: --test-runner
 --test-runner:
-	go test ./... -race -covermode=atomic -coverprofile=./coverage/coverage.txt
+	go test ./src -race -covermode=atomic -coverprofile=./coverage/coverage.txt
 	go tool cover -html=./coverage/coverage.txt -o ./coverage/coverage.html
 
 
