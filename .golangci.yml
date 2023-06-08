@@ -285,26 +285,6 @@ linters-settings:
     #   - shadow
     disable-all: false
 
-  depguard:
-    # linter to check if package imports are in a list of acceptable packages
-    list-type: blacklist    # either `blacklist` or `whitelist`
-    include-go-root: false
-    # packages:
-    #   - github.com/sirupsen/logrus
-
-    # specify an error message to output when a blacklisted package is used
-    # packages-with-error-message:
-      # - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
-
-  ifshort:
-    # max length of variable declaration measured in number of lines, beyond which
-    # linter won't suggest using short syntax - higher priority than `max-decl-chars`
-    max-decl-lines: 1
-
-    # max length of variable declaration measured in number of characters, beyond which
-    #  linter won't suggest using short syntax
-    max-decl-chars: 30
-
   lll:
     # max line length, lines longer will be reported. Default is 120.
     line-length: 88   # tab (`\t`) is counted as 1 character by default
@@ -420,10 +400,6 @@ linters-settings:
     # directory with the changed file.
     check-exported: false
 
-  unused:
-    # Checks code for unused constants, variables, functions and types
-    go: "1.18"      # go version to target. The default is '1.13'
-
   whitespace:
     # Tool for detection of leading and trailing whitespace - checks for unnecessary
     # newlines at the start and end of functions, if, for, etc.
@@ -466,20 +442,16 @@ linters:
   disable-all: true   # disable all, selectively enable what is needed
   enable:
     # Defaults
-    - deadcode
     - errcheck
     - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - structcheck
     - typecheck
     - unused
-    - varcheck
 
     # Additional
     - cyclop
-    - depguard
     - dogsled
     - dupl
     - errname
@@ -498,7 +470,6 @@ linters:
     - gomnd
     - goprintffuncname
     - gosec
-    - ifshort
     - lll
     - makezero
     - misspell
