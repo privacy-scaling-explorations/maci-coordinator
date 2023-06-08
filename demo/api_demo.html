@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MACI Coordinator API Demo</title>
+</head>
+<body>
+    <h1>MACI Coordinator API Demo</h1>
+
+    <input type="text" id="maciPollId" placeholder="maciPollId" />
+    <button onclick="generateProof()">Generate Proof</button>
+	<button onclick="checkStatus()">Check Status</button>
+    <button onclick="getResult()">Get Result</button>
+
+    <h2>Response</h2>
+    <pre id="response"></pre>
+
+    <script>
+	function generateProof() {
+        var maciPollId = document.getElementById('maciPollId').value;
+        fetch(`/api/genproof`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({maciPollId: maciPollId, name: "Test Name", authToken: "Test Token"}),
+        })
+        .then(response => response.json())
+        .then(data => document.getElementById('response').textContent = JSON.stringify(data, null, 2));
+    }
+    function checkStatus() {
+        var maciPollId = document.getElementById('maciPollId').value;
+        fetch(`/api/checkStatus/${maciPollId}`)
+            .then(response => response.json())
+            .then(data => document.getElementById('response').textContent = JSON.stringify(data, null, 2));
+    }
+
+    function getResult() {
+        var maciPollId = document.getElementById('maciPollId').value;
+        fetch(`/api/getResult/${maciPollId}`)
+            .then(response => response.json())
+            .then(data => document.getElementById('response').textContent = JSON.stringify(data, null, 2));
+    }
+    </script>
+</body>
+</html>

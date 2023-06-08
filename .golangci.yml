@@ -102,10 +102,6 @@ linters-settings:
     lines: 45
     statements: 30
 
-  gci:
-    no-inline-comments: false
-    no-prefix-comments: false
-
     # sorts imports with prefix after 3rd-party packages; supports only one prefix - if
     # not set, uses goimports.local-prefixes
     sections:
@@ -223,13 +219,6 @@ linters-settings:
     # simplify code: gofmt with `-s` option, true by default
     simplify: true
 
-  gofumpt:
-    # select the Go version to target. The default is `1.15`.
-    lang-version: "1.18"
-
-    # choose whether or not to use the extra rules - disabled by default
-    extra-rules: true
-
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
@@ -284,11 +273,6 @@ linters-settings:
     # disable:
     #   - shadow
     disable-all: false
-
-  lll:
-    # max line length, lines longer will be reported. Default is 120.
-    line-length: 88   # tab (`\t`) is counted as 1 character by default
-    tab-width: 1      # tab width in spaces. Default to 1
 
   makezero:
     # find slice declarations not initialized with zero length, and used with append
@@ -458,25 +442,21 @@ linters:
     - errorlint
     - exhaustive
     - forbidigo
-    - gci
     - gocognit
     - goconst
     - gocritic
     - gocyclo
     - gofmt
-    - gofumpt
     - funlen
     - goimports
     - gomnd
     - goprintffuncname
     - gosec
-    - lll
     - makezero
     - misspell
     - nakedret
     - nestif
     - nilerr
-    - noctx
     - nolintlint
     - predeclared
     - revive
