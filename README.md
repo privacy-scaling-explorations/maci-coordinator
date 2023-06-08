@@ -3,7 +3,7 @@
 <div align="center">
 
 [![Build Status](https://img.shields.io/github/checks-status/privacy-scaling-explorations/maci-coordinator/main)][github-actions]
-[![Code Coverage](https://coveralls.io/repos/github/privacy-scaling-explorations/maci-coordinator/badge.svg)][github-actions-tests]
+[![Coverage Status](https://coveralls.io/repos/github/privacy-scaling-explorations/maci-coordinator/badge.svg?branch=main)](https://coveralls.io/github/privacy-scaling-explorations/maci-coordinator?branch=main)
 [![Security: bandit](https://img.shields.io/badge/Security-GoSec-blue)](https://github.com/securego/gosec)
 [![GitHub Release](https://img.shields.io/github/v/release/privacy-scaling-explorations/maci-coordinator)][github-releases]
 [![License](https://img.shields.io/github/license/privacy-scaling-explorations/maci-coordinator)][project-license]
