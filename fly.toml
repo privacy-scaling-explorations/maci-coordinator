@@ -1,0 +1,18 @@
+# fly.toml app configuration file generated for maci-coordinator on 2023-06-19T18:28:42+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "maci-coordinator"
+primary_region = "ams"
+
+[build]
+  image = "ghcr.io/privacy-scaling-explorations/maci-coordinator:main"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  min_machines_running = 0

@@ -29,7 +29,7 @@ func NewRouter() *gin.Engine {
 	r.GET("/api/checkStatus/:maciPollId", CheckStatus)
 	r.GET("/api/getResult/:maciPollId", GetResult)
 
-	r.GET("/index", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "api_demo.html", nil)
 	})
 
