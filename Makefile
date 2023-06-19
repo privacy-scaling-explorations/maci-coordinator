@@ -7,6 +7,8 @@
 # Name of the current directory
 PROJECTNAME="maci-coordinator"
 
+REPOSITORY="privacy-scaling-explorations/$(PROJECTNAME)"
+
 # List of all Go-files to be processed
 GOFILES=$(wildcard *.go)
 
@@ -119,30 +121,30 @@ run-debug:
 ## :
 ## `docker-gen`: Create a production docker image for `maci-coordinator`
 docker-gen:
-	echo "Building docker image \`$(IMAGE):$(VERSION)\`..."
+	echo "Building docker image \`ghcr.io/$(REPOSITORY):$(VERSION)\`..."
 	docker build --rm \
 		--build-arg final_image=scratch \
 		--build-arg build_mode=production \
-		-t $(IMAGE):$(VERSION) . \
+		-t ghcr.io/$(REPOSITORY):$(VERSION) . \
 		-f ./docker/Dockerfile
 
 
 .PHONY: docker-debug
 ## `docker-debug`: Create debug-friendly docker images for `maci-coordinator`
 docker-debug:
-	echo "Building docker image \`$(IMAGE):$(VERSION)\`..."
+	echo "Building docker image \`ghcr.io/$(REPOSITORY):$(VERSION)\`..."
 	docker build --rm=false \
 		--build-arg final_image=golang:1.18 \
 		--build-arg build_mode=debug \
-		-t $(IMAGE)-debug:$(VERSION) . \
+		-t ghcr.io/$(REPOSITORY):$(VERSION) . \
 		-f ./docker/Dockerfile
 
 
 .PHONY: clean-docker
 ## `clean-docker`: Delete an existing docker image
 clean-docker:
-	echo "Removing docker $(IMAGE):$(VERSION)..."
-	docker rmi -f $(IMAGE):$(VERSION)
+	echo "Removing docker ghcr.io/$(REPOSITORY):$(VERSION)..."
+	docker rmi -f ghcr.io/$(REPOSITORY):$(VERSION)
 
 
 ## :
