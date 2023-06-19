@@ -55,6 +55,9 @@ ENV __BUILD_MODE__=${build_mode}
 ENV ${build_mode}_mode=${build_mode}
 # ^^ will be `debug_mode` or `production_mode`
 
+# Copy demo webPage
+COPY "./demo" \
+    "./demo"
 
 # Run the binary
 CMD ["./maci-coordinator"]

@@ -1,3 +1,7 @@
+# MACI artifacts
+data/**
+
+
 # Git
 .git
 .gitignore
