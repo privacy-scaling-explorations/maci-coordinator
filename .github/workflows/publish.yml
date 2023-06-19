@@ -1,4 +1,4 @@
-name: Create and publish a Docker image
+name: deploy-with-flyctl
 
 on:
   push:
@@ -33,3 +33,17 @@ jobs:
 
       - name: Push Docker image
         run: docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+
+
+  deploy:
+    needs: build-and-push-image
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
