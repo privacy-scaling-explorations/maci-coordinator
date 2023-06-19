@@ -22,6 +22,8 @@ require (
 	github.com/iden3/go-rapidsnark/prover v0.0.10 // indirect
 	github.com/iden3/go-rapidsnark/types v0.0.3 // indirect
 	github.com/iden3/go-rapidsnark/verifier v0.0.5 // indirect
+	github.com/iden3/go-rapidsnark/witness v0.0.6 // indirect
+	github.com/iden3/wasmer-go v0.0.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect

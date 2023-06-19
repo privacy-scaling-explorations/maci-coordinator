@@ -18,3 +18,8 @@ coverage/**
 
 
 data/zkeys/*
+
+
+*.wtns
+
+.DS_Store
