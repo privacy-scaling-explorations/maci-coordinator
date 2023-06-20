@@ -2,43 +2,92 @@
 <html>
 <head>
     <title>MACI Coordinator API Demo</title>
+    <style>
+        #request, #response {
+            width: 48%;
+            display: inline-block;
+            vertical-align: top;
+        }
+        #request {
+            margin-right: 2%;
+        }
+    </style>
 </head>
 <body>
     <h1>MACI Coordinator API Demo</h1>
+    <div id="request">
+        <button onclick="generateProof()">Generate Proof</button>
+        <button onclick="getResult()">Get Result</button>
+        <br/>
+        <select id="circuitName">
+            <option value="ProcessMessages">ProcessMessages</option>
+            <option value="TallyVotes">TallyVotes</option>
+        </select>
+        <br/>
+        <textarea id="circuitInput" rows="10" cols="50" placeholder="circuitInput (JSON format)"></textarea>
+    </div>
+    <div id="response">
+        <h2>Response</h2>
+        <p id="responseStatus"></p>
+        <pre id="responseData"></pre>
+    </div>
 
-    <input type="text" id="maciPollId" placeholder="maciPollId" />
-    <button onclick="generateProof()">Generate Proof</button>
-	<button onclick="checkStatus()">Check Status</button>
-    <button onclick="getResult()">Get Result</button>
+    <h2>API Design</h2>
+    <pre>
+    API: /generateProof
+    - Request (POST):
+        {
+            "circuitName": "ProcessMessages",
+            "circuitInput": {}
+        }
 
-    <h2>Response</h2>
-    <pre id="response"></pre>
+    - Response:
+        {
+            "status": "ok",
+            "data": {}
+        }
+
+    API: /getResult
+    - Request (GET):
+
+    - Response:
+        {
+            "circuit": {
+                "name": "ProcessMessages",
+                "status": "Finished",
+                "result": {
+                    "proof": {},
+                    "publicInput": {}
+                }
+            }
+        }
+    </pre>
 
     <script>
-	function generateProof() {
-        var maciPollId = document.getElementById('maciPollId').value;
-        fetch(`/api/genproof`, {
+    function generateProof() {
+        var circuitName = document.getElementById('circuitName').value;
+        var circuitInput = document.getElementById('circuitInput').value;
+        fetch(`/generateProof`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({maciPollId: maciPollId, name: "Test Name", authToken: "Test Token"}),
+            body: JSON.stringify({circuitName: circuitName, circuitInput: JSON.parse(circuitInput)}),
         })
-        .then(response => response.json())
-        .then(data => document.getElementById('response').textContent = JSON.stringify(data, null, 2));
-    }
-    function checkStatus() {
-        var maciPollId = document.getElementById('maciPollId').value;
-        fetch(`/api/checkStatus/${maciPollId}`)
-            .then(response => response.json())
-            .then(data => document.getElementById('response').textContent = JSON.stringify(data, null, 2));
+        .then(response => {
+            document.getElementById('responseStatus').textContent = 'Status: ' + response.status;
+            return response.json();
+        })
+        .then(data => document.getElementById('responseData').textContent = JSON.stringify(data, null, 2));
     }
 
     function getResult() {
-        var maciPollId = document.getElementById('maciPollId').value;
-        fetch(`/api/getResult/${maciPollId}`)
-            .then(response => response.json())
-            .then(data => document.getElementById('response').textContent = JSON.stringify(data, null, 2));
+        fetch(`/getResult`)
+        .then(response => {
+            document.getElementById('responseStatus').textContent = 'Status: ' + response.status;
+            return response.json();
+        })
+        .then(data => document.getElementById('responseData').textContent = JSON.stringify(data, null, 2));
     }
     </script>
 </body>

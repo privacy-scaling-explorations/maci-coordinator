@@ -6,28 +6,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Request struct {
-	MaciPollID string `json:"maciPollId"`
-	Name       string `json:"name"`
-	AuthToken  string `json:"authToken"`
-}
-
-type Status struct {
-	MaciPollID string `json:"maciPollId"`
-	Status     string `json:"status"`
+type Circuit struct {
+	Result Result `json:"result"`
+	Status string `json:"status"`
 }
 
 type Result struct {
-	MaciPollID string `json:"maciPollId"`
-	Proof      string `json:"proof"` // Change this to the data type of your proof
+	Proof       interface{} `json:"proof"`
+	PublicInput interface{} `json:"publicInput"`
+}
+
+type ResponseData struct {
+	ProcessMessagesCircuit Circuit `json:"processMessagesCircuit"`
+	TallyVotesCircuit      Circuit `json:"tallyVotesCircuit"`
 }
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 
-	r.POST("/api/genproof", GenerateProof)
-	r.GET("/api/checkStatus/:maciPollId", CheckStatus)
-	r.GET("/api/getResult/:maciPollId", GetResult)
+	r.POST("/api/generateProof", GenerateProof)
+	r.GET("/api/getResult", GetResult)
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "api_demo.html", nil)
@@ -37,25 +35,41 @@ func NewRouter() *gin.Engine {
 }
 
 func GenerateProof(c *gin.Context) {
-	var req Request
+	//nolint:gocritic //  This is a placeholder to use when implementing the following:ㅎ
+	//
+	// circuitName := c.PostForm("circuitName")
+	// circuitInput := c.PostForm("circuitInput")
 
-	if err := c.BindJSON(&req); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": false, "message": err.Error()})
+	// Implement your logic to generate proof here.
 
-		return
-	}
-
-	c.JSON(http.StatusOK, Status{MaciPollID: req.MaciPollID, Status: "Proof generation requested"})
-}
-
-func CheckStatus(c *gin.Context) {
-	maciPollID := c.Params.ByName("maciPollId")
-
-	c.JSON(http.StatusOK, Status{MaciPollID: maciPollID, Status: "Processing"})
+	c.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "OK",
+	})
 }
 
 func GetResult(c *gin.Context) {
-	maciPollID := c.Params.ByName("maciPollId")
+	// Implement your logic to get result here.
 
-	c.JSON(http.StatusOK, Result{MaciPollID: maciPollID, Proof: "I'm an awesome proof"})
+	data := ResponseData{
+		ProcessMessagesCircuit: Circuit{
+			Status: "inProgress", // Replace with actual status
+			Result: Result{
+				Proof:       nil, // Replace with actual proof
+				PublicInput: nil, // Replace with actual public input
+			},
+		},
+		TallyVotesCircuit: Circuit{
+			Status: "inProgress", // Replace with actual status
+			Result: Result{
+				Proof:       nil, // Replace with actual proof
+				PublicInput: nil, // Replace with actual public input
+			},
+		},
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+		"data":   data,
+	})
 }
