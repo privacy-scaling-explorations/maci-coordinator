@@ -15,7 +15,6 @@ func main() {
 	firstCheck()
 	secondCheck()
 
-
 	prover := src.Prover{
 		ProcessMessagesCircuit: src.Circuit{
 			Result: src.Result{},
