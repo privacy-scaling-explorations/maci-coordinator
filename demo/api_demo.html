@@ -3,12 +3,19 @@
 <head>
     <title>MACI Coordinator API Demo</title>
     <style>
-        #request, #response {
-            width: 48%;
+        #request, #response, #sentRequest {
+            width: 30%;
             display: inline-block;
             vertical-align: top;
         }
         #request {
+            margin-right: 2%;
+        }
+		#sentRequest pre {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #response {
             margin-right: 2%;
         }
     </style>
@@ -26,13 +33,17 @@
         <br/>
         <textarea id="circuitInput" rows="10" cols="50" placeholder="circuitInput (JSON format)"></textarea>
     </div>
+    <div id="sentRequest">
+        <h2>Sent Request</h2>
+        <pre id="requestData"></pre>
+    </div>
     <div id="response">
         <h2>Response</h2>
         <p id="responseStatus"></p>
         <pre id="responseData"></pre>
     </div>
 
-    <h2>API Design</h2>
+	<h2>API Design</h2>
     <pre>
     API: /generateProof
     - Request (POST):
@@ -63,17 +74,26 @@
         }
     </pre>
 
+    <!-- Rest of the code -->
+
     <script>
     function generateProof() {
         var circuitName = document.getElementById('circuitName').value;
         var circuitInput = document.getElementById('circuitInput').value;
-        fetch(`/generateProof`, {
+        var requestBody = JSON.stringify({circuitName: circuitName, circuitInput: JSON.parse(circuitInput)});
+
+		var request = {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({circuitName: circuitName, circuitInput: JSON.parse(circuitInput)}),
-        })
+            body: requestBody,
+        };
+
+        // Display the sent request
+        document.getElementById('requestData').textContent = JSON.stringify(request);
+
+        fetch(`/api/generateProof`, request)
         .then(response => {
             document.getElementById('responseStatus').textContent = 'Status: ' + response.status;
             return response.json();
@@ -82,7 +102,10 @@
     }
 
     function getResult() {
-        fetch(`/getResult`)
+        // Display the sent request
+        document.getElementById('requestData').textContent = 'GET /api/getResult';
+
+        fetch(`/api/getResult`)
         .then(response => {
             document.getElementById('responseStatus').textContent = 'Status: ' + response.status;
             return response.json();

@@ -18,6 +18,7 @@ coverage/**
 
 
 # Ignore MACI artifacts
+instruments
 data/zkeys/**
 *.wtns
 

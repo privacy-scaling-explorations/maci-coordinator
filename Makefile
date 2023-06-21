@@ -123,6 +123,7 @@ run-debug:
 docker-gen:
 	echo "Building docker image \`ghcr.io/$(REPOSITORY):$(VERSION)\`..."
 	docker build --rm \
+		--platform linux/amd64 \
 		--build-arg final_image=scratch \
 		--build-arg build_mode=production \
 		-t ghcr.io/$(REPOSITORY):$(VERSION) . \
@@ -134,6 +135,7 @@ docker-gen:
 docker-debug:
 	echo "Building docker image \`ghcr.io/$(REPOSITORY):$(VERSION)\`..."
 	docker build --rm=false \
+		--platform linux/amd64 \
 		--build-arg final_image=golang:1.18 \
 		--build-arg build_mode=debug \
 		-t ghcr.io/$(REPOSITORY):$(VERSION) . \

@@ -28,6 +28,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Download artifacts
+        run: |
+          mkdir -p ./instruments
+
+          wget -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/ProcessMessages_6-8-2-3_test.wasm
+          wget -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/ProcessMessages_6-8-2-3_test.0.zkey
+
       - name: Build
         run: make docker-gen VERSION=${{ github.ref_name }}
 

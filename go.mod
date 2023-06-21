@@ -2,9 +2,19 @@ module github.com/privacy-scaling-explorations/maci-coordinator
 
 go 1.18
 
+// To avoid following error:
+//   imports github.com/iden3/go-rapidsnark/prover: build constraints exclude all Go files in /go/pkg/mod/github.com/iden3/go-rapidsnark/prover@v0.0.10
+// replace github.com/iden3/go-rapidsnark/prover => ./prover
+
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/iden3/go-rapidsnark/prover v0.0.10
 	github.com/stretchr/testify v1.8.4
+)
+
+require (
+	github.com/iden3/go-rapidsnark/types v0.0.2 // indirect
+	github.com/iden3/wasmer-go v0.0.1 // indirect
 )
 
 require (
@@ -16,7 +26,8 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.14.1 // indirect
-	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/goccy/go-json v0.10.2
+	github.com/iden3/go-rapidsnark/witness v0.0.6
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
