@@ -75,7 +75,7 @@ linters-settings:
       # - io/ioutil.ReadFile
 
   errorlint:
-    # check whether fmt.Errorf uses the %w verb for formatting errors.
+    # check whether fmt.Printf uses the %w verb for formatting errors.
     # read https://github.com/polyfloyd/go-errorlint for more info
     errorf: true
     # check for plain type assertions and type switches
@@ -149,8 +149,8 @@ linters-settings:
       # support this tag (yet)
       # - security
 
-    # disabled-tags:
-    #   - experimental
+    disabled-tags:
+      - experimental
 
     # settings passed to gocritic.
     # the settings key is the name of a supported gocritic checker.

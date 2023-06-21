@@ -15,7 +15,18 @@ func main() {
 	firstCheck()
 	secondCheck()
 
-	r := src.NewRouter()
+	prover := src.Prover{
+		ProcessMessagesCircuit: src.Circuit{
+			Result: src.Result{},
+			Status: src.WaitingForRequest,
+		},
+		TallyVotesCircuit: src.Circuit{
+			Result: src.Result{},
+			Status: src.WaitingForRequest,
+		},
+	}
+
+	r := src.NewRouter(prover)
 	r.LoadHTMLFiles("demo/api_demo.html")
 
 	// listen and serve on localhost:8080
