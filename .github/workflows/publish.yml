@@ -32,8 +32,10 @@ jobs:
         run: |
           mkdir -p ./instruments
 
-          wget -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/ProcessMessages_6-8-2-3_test.wasm
-          wget -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/ProcessMessages_6-8-2-3_test.0.zkey
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/ProcessMessages_10-2-1-2_test.wasm
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/TallyVotes_10-1-2_test.wasm
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/ProcessMessages_10-2-1-2_test.0.zkey
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/TallyVotes_10-1-2_test.0.zkey
 
       - name: Build
         run: make docker-gen VERSION=${{ github.ref_name }}
