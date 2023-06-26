@@ -58,7 +58,7 @@ func NewRouter(p Prover) *gin.Engine {
 	return r
 }
 
-//nolint:funlen, gocognit // PoC skip
+//nolint:funlen, gocognit, gocyclo, cyclop // PoC skip
 func (p *Prover) GenerateProof(c *gin.Context) {
 	var request RequestData
 	if err := c.ShouldBind(&request); err != nil {
@@ -68,71 +68,137 @@ func (p *Prover) GenerateProof(c *gin.Context) {
 
 	fmt.Println(request.CircuitName)
 
-	go func() {
-		p.ProcessMessagesCircuit.Status = GeneratingProof
+	//nolint: dupl // PoC skip
+	switch request.CircuitName {
+	case "ProcessMessages":
+		go func() {
+			p.ProcessMessagesCircuit.Status = GeneratingProof
 
-		// 1. Calculate witness
-		start := time.Now()
-		wasmBytes, err := os.ReadFile("./instruments/ProcessMessages_6-8-2-3_test.wasm")
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
+			// 1. Calculate witness
+			start := time.Now()
+			wasmBytes, err := os.ReadFile("./instruments/ProcessMessages_10-2-1-2_test.wasm")
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-		inputs, err := witness.ParseInputs(request.CircuitInput)
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
+			inputs, err := witness.ParseInputs(request.CircuitInput)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-		calc, err := witness.NewCircom2WitnessCalculator(wasmBytes, true)
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
+			calc, err := witness.NewCircom2WitnessCalculator(wasmBytes, true)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-		wtns, err := calc.CalculateWTNSBin(inputs, true)
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
+			wtns, err := calc.CalculateWTNSBin(inputs, true)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-		//nolint:gomnd // PoC skip
-		err = os.WriteFile("./data/processMessages/6-8-2-3/witness_wasm.wtns", wtns, 0600)
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
+			//nolint:gomnd // PoC skip
+			err = os.WriteFile("./data/ProcessMessages/10-2-1-2/witness_wasm.wtns", wtns, 0600)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-		elapsed := time.Since(start) // Calculate the elapsed time
-		fmt.Printf("Elapsed time for witness calculation 6-8-2-3 Processmessages: %s\n", elapsed)
+			elapsed := time.Since(start) // Calculate the elapsed time
+			fmt.Printf("Elapsed time for witness calculation 10-2-1-2 Processmessages: %s\n", elapsed)
 
-		// 2. Generate Proof
-		provingKey, err := os.ReadFile("./instruments/ProcessMessages_6-8-2-3_test.0.zkey")
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
-		witnessOutput, err := os.ReadFile("./data/processMessages/6-8-2-3/witness_wasm.wtns")
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
+			// 2. Generate Proof
+			provingKey, err := os.ReadFile("./instruments/ProcessMessages_10-2-1-2_test.0.zkey")
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+			witnessOutput, err := os.ReadFile("./data/ProcessMessages/10-2-1-2/witness_wasm.wtns")
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-		start = time.Now() // Get the current time
+			start = time.Now() // Get the current time
 
-		proof, publicInput, err := prover.Groth16ProverRaw(provingKey, witnessOutput)
-		if err != nil {
-			fmt.Printf("err: %s", err)
-		}
+			proof, publicInput, err := prover.Groth16ProverRaw(provingKey, witnessOutput)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-		p.ProcessMessagesCircuit.Result.Proof = proof
-		p.ProcessMessagesCircuit.Result.PublicInput = publicInput
+			p.ProcessMessagesCircuit.Result.Proof = proof
+			p.ProcessMessagesCircuit.Result.PublicInput = publicInput
 
-		elapsed = time.Since(start) // Calculate the elapsed time
+			elapsed = time.Since(start) // Calculate the elapsed time
 
-		fmt.Printf("Elapsed time for gen proof 6-8-2-3: %s\n", elapsed)
+			fmt.Printf("Elapsed time for gen proof 10-2-1-2: %s\n", elapsed)
 
-		p.ProcessMessagesCircuit.Status = ProofAvailable
-	}()
+			p.ProcessMessagesCircuit.Status = ProofAvailable
+			fmt.Println("Proof available for ProcessMessages")
+		}()
+	case "TallyVotes":
+		go func() {
+			p.TallyVotesCircuit.Status = GeneratingProof
+			// 1. Calculate witness
+			start := time.Now()
+			wasmBytes, err := os.ReadFile("./instruments/TallyVotes_10-1-2_test.wasm")
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  http.StatusOK,
-		"message": "OK",
-	})
+			inputs, err := witness.ParseInputs(request.CircuitInput)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+
+			calc, err := witness.NewCircom2WitnessCalculator(wasmBytes, true)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+
+			wtns, err := calc.CalculateWTNSBin(inputs, true)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+
+			//nolint:gomnd // PoC skip
+			err = os.WriteFile("./data/TallyVotes/10-1-2/witness_wasm.wtns", wtns, 0600)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+
+			elapsed := time.Since(start) // Calculate the elapsed time
+			fmt.Printf("Elapsed time for witness calculation 10-1-2 TallyVotes: %s\n", elapsed)
+
+			// 2. Generate Proof
+			provingKey, err := os.ReadFile("./instruments/TallyVotes_10-1-2_test.0.zkey")
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+			witnessOutput, err := os.ReadFile("./data/TallyVotes/10-1-2/witness_wasm.wtns")
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+
+			start = time.Now() // Get the current time
+
+			proof, publicInput, err := prover.Groth16ProverRaw(provingKey, witnessOutput)
+			if err != nil {
+				fmt.Printf("err: %s", err)
+			}
+
+			p.TallyVotesCircuit.Result.Proof = proof
+			p.TallyVotesCircuit.Result.PublicInput = publicInput
+
+			elapsed = time.Since(start) // Calculate the elapsed time
+
+			fmt.Printf("Elapsed time for gen proof 10-1-2 TallyVotes: %s\n", elapsed)
+
+			p.TallyVotesCircuit.Status = ProofAvailable
+			fmt.Println("Proof available for TallyVotes")
+		}()
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":  http.StatusOK,
+			"message": "OK",
+		})
+	}
 }
 
 func (p *Prover) GetResult(c *gin.Context) {
