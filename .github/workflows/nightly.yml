@@ -32,6 +32,11 @@ jobs:
           ref: 'maci-coordinator'
           path: 'maci'
 
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
       - name: Build MACI
         run: |
           cd maci
