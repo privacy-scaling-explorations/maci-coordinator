@@ -54,5 +54,5 @@ jobs:
 
       - name: Run E2E Test Suite
         run: |
-          cd maci
-          bash .github/scripts/run-e2e-tests.sh
+          cd maci/cli
+          bash test_coordinator-service.sh
