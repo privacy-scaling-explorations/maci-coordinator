@@ -1,0 +1,53 @@
+name: Nightly
+
+on:
+  push:
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18.x
+
+      - name: Install Dependencies
+        run: go mod download
+
+      # maci-coordinator will listen on port 8080 locally
+      - name: Run maci-coordinator
+        run: nohup make run & sleep 5
+
+
+      # Run `maci-coordinator` flavored e2e test suite of MACI
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          repository: 'gurrpi/maci'
+          ref: 'maci-coordinator'
+          path: 'maci'
+
+      - name: Build MACI
+        run: |
+          cd maci
+          npm install
+          npm run bootstrap
+          npm run build
+
+          cd contracts
+          npm run compileSol
+
+      - name: Run local hardhat node
+        run: |
+          cd maci
+          bash ./.github/scripts/hnctl.sh start_hardhat_network
+
+      - name: Run E2E Test Suite
+        run: |
+          cd maci
+          bash .github/scripts/run-e2e-tests.sh
