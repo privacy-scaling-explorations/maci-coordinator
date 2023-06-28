@@ -1,21 +1,33 @@
-### api/genproof
+### /api/generateProof
 
+Send a POST request to the `/api/generateProof` endpoint with a JSON body containing the cicuit input of the desired circuit:
+
+ProcessMessages:
 ```
 curl \
   -X POST \
   -H "Content-Type: application/json" \
-  -d '{"maciPollId":"12345","name":"Ethcon Korea 2023","authToken":"PVT_kwDOBheqls4AMmQM"}' \
-  http://localhost:8080/api/genproof
+  -d @demo/request_generateProof_ProcessMessages.json \
+  http://localhost:8080/api/generateProof
 ```
 
-### /api/checkStatus/{maciPollId}
+TallyVotes:
+```
+curl \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d @demo/request_generateProof_TallyVotes.json \
+  http://localhost:8080/api/generateProof
+```
+
+### /api/getResult
 
 ```
-curl http://localhost:8080/api/checkStatus/12345
+curl http://localhost:8080/api/getResult
 ```
 
-### /api/getResult/{maciPollId}
+## Generate Proof using snarkjs
 
 ```
-curl http://localhost:8080/api/getResult/12345
+snarkjs groth16 prove instruments/TallyVotes_10-1-2_test.0.zkey data/TallyVotes/10-1-2/witness_wasm.wtns outputs/proof_TallyVotes_10-1-2.json outputs/public_TallyVotes_10-1-2.json
 ```
