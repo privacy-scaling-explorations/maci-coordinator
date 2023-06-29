@@ -58,6 +58,7 @@ jobs:
       - name: Run maci-coordinator
         run: |
           cd maci-coordinator
+          sudo apt-get install build-essential
           nohup make run & sleep 5
 
 
