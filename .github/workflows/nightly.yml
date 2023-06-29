@@ -39,33 +39,36 @@ jobs:
     name: Do the job on the runner
     needs: start-runner # required to start the main job when the runner is ready
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
-    env:
-      GO111MODULE: on
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          path: 'maci-coordinator'
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
+      #   with:
+      #     path: 'maci-coordinator'
 
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.18.x
-          cache: false
+      # - name: Setup Go
+      #   uses: actions/setup-go@v4
+      #   with:
+      #     go-version: 1.18.x
+      #     cache: false
 
       # - name: Install Dependencies
       #   run: |
       #     cd maci-coordinator
       #     go mod download
 
+      - uses: docker-practice/actions-setup-docker@master
+        timeout-minutes: 30
+
       # maci-coordinator will listen on port 8080 locally
       - name: Run maci-coordinator
         run: |
-          cd maci-coordinator
-          sudo apt-get update
-          sudo apt-get install -y build-essential
-          nohup make run & sleep 5
+          # cd maci-coordinator
+          # sudo apt-get update
+          # sudo apt-get install -y build-essential
+          # nohup make run & sleep 5
+
+          docker run --detach --platform linux/amd64 -p 8080:8080 ghcr.io/privacy-scaling-explorations/maci-coordinator:main
 
 
       # Run `maci-coordinator` flavored e2e test suite of MACI
