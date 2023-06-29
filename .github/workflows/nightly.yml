@@ -41,18 +41,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          path: 'maci-coordinator'
 
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.18.x
 
-      # - name: Install Dependencies
-      #   run: go mod download
+      - name: Install Dependencies
+        run: |
+          cd maci-coordinator
+          go mod download
 
       # maci-coordinator will listen on port 8080 locally
       - name: Run maci-coordinator
-        run: nohup make run & sleep 5
+        run: |
+          cd maci-coordinator
+          nohup make run & sleep 5
 
 
       # Run `maci-coordinator` flavored e2e test suite of MACI
