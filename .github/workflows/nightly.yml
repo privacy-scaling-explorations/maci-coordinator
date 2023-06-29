@@ -54,10 +54,10 @@ jobs:
           go-version: 1.18.x
           cache: false
 
-      - name: Install Dependencies
-        run: |
-          cd maci-coordinator
-          go mod download
+      # - name: Install Dependencies
+      #   run: |
+      #     cd maci-coordinator
+      #     go mod download
 
       # maci-coordinator will listen on port 8080 locally
       - name: Run maci-coordinator
