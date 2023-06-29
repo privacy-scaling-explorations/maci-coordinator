@@ -1,0 +1,114 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  start-runner:
+    name: Start self-hosted EC2 runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-0d65ed0872506990c
+          ec2-instance-type: t3.2xlarge
+          subnet-id: subnet-0817be1b2160793b5
+          security-group-id: sg-0aea3cbb15e30a921
+          aws-resource-tags: >
+            [
+                { "Key": "Name", "Value": "maci-coordinator-github-runner" },
+                { "Key": "GitHubRepository", "Value": "${{ github.repository }}" }
+            ]
+
+
+  do-the-job:
+    name: Do the job on the runner
+    needs: start-runner
+    runs-on: ${{ needs.start-runner.outputs.label }}
+
+    steps:
+
+      - name: Install Docker
+        run: |
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
+
+
+      # maci-coordinator will listen on port 8080 locally
+      - name: Run maci-coordinator
+        run: |
+
+          sudo docker run --detach --platform linux/amd64 -p 8080:8080 ghcr.io/privacy-scaling-explorations/maci-coordinator:main
+
+
+      # Run `maci-coordinator` flavored e2e test suite of MACI
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          repository: 'gurrpi/maci'
+          ref: 'maci-coordinator'
+          path: 'maci'
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Build MACI
+        run: |
+          cd maci
+          npm install
+          npm run bootstrap
+          npm run build
+
+          cd contracts
+          npm run compileSol
+
+      - name: Run local hardhat node
+        run: |
+          cd maci
+          bash ./.github/scripts/hnctl.sh start_hardhat_network
+
+      - name: Run E2E Test Suite
+        run: |
+          cd maci/cli
+          bash test_coordinator-service.sh
+
+
+  stop-runner:
+    name: Stop self-hosted EC2 runner
+    needs:
+      - start-runner
+      - do-the-job
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Stop EC2 runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}

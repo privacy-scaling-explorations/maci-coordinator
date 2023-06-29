@@ -21,5 +21,6 @@ coverage/**
 instruments
 data/zkeys/**
 *.wtns
+outputs/**
 
 .DS_Store
