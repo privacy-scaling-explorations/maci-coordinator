@@ -48,7 +48,7 @@ RUN go mod download
 COPY . .
 
 # Generate a binary -- custom name to avoid collisions with existing files/directories
-RUN go build -v -o "/builds/maci-coordinator"
+RUN go build -tags rapidsnark_asm -ldflags="-s -w" -trimpath -v -o "/builds/maci-coordinator"
 
 
 
@@ -66,20 +66,20 @@ COPY "./demo" \
 
 # Copy instruments needed to generate proof
 # Before building the image, you'll need to prepare these files
-COPY "./instruments/ProcessMessages_10-2-1-2_test.0.zkey" \
-    "./instruments/ProcessMessages_10-2-1-2_test.0.zkey"
+COPY "./instruments/ProcessMessages_6-8-2-3_test.0.zkey" \
+    "./instruments/ProcessMessages_6-8-2-3_test.0.zkey"
 
-COPY "./instruments/ProcessMessages_10-2-1-2_test.wasm" \
-    "./instruments/ProcessMessages_10-2-1-2_test.wasm"
+COPY "./instruments/ProcessMessages_6-8-2-3_test.wasm" \
+    "./instruments/ProcessMessages_6-8-2-3_test.wasm"
 
-COPY "./instruments/TallyVotes_10-1-2_test.0.zkey" \
-    "./instruments/TallyVotes_10-1-2_test.0.zkey"
+COPY "./instruments/TallyVotes_6-2-3_test.0.zkey" \
+    "./instruments/TallyVotes_6-2-3_test.0.zkey"
 
-COPY "./instruments/TallyVotes_10-1-2_test.wasm" \
-    "./instruments/TallyVotes_10-1-2_test.wasm"
+COPY "./instruments/TallyVotes_6-2-3_test.wasm" \
+    "./instruments/TallyVotes_6-2-3_test.wasm"
 
-RUN mkdir -p /builds/data/ProcessMessages/10-2-1-2
-RUN mkdir -p /builds/data/TallyVotes/10-1-2
+RUN mkdir -p /builds/data/ProcessMessages/6-8-2-3
+RUN mkdir -p /builds/data/TallyVotes/6-2-3
 
 # Run the binary
 CMD ["./maci-coordinator"]

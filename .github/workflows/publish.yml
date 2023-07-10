@@ -32,10 +32,10 @@ jobs:
         run: |
           mkdir -p ./instruments
 
-          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/ProcessMessages_10-2-1-2_test.wasm
-          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/TallyVotes_10-1-2_test.wasm
-          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/ProcessMessages_10-2-1-2_test.0.zkey
-          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/v1.1.1-aa4ba27/10-2-1-2/TallyVotes_10-1-2_test.0.zkey
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/ProcessMessages_6-8-2-3_test.wasm
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/TallyVotes_6-2-3_test.wasm
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/ProcessMessages_6-8-2-3_test.0.zkey
+          wget -q -P ./instruments https://maci-develop-fra.s3.eu-central-1.amazonaws.com/6f45848_20230309/TallyVotes_6-2-3_test.0.zkey
 
       - name: Build
         run: make docker-gen VERSION=${{ github.ref_name }}
@@ -43,16 +43,16 @@ jobs:
       - name: Push Docker image
         run: docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
 
+# TODO: replace to ECS deployment
+  # deploy:
+  #   needs: build-and-push-image
+  #   name: Deploy
+  #   runs-on: ubuntu-latest
 
-  deploy:
-    needs: build-and-push-image
-    name: Deploy
-    runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
 
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  #     - uses: superfly/flyctl-actions/setup-flyctl@master
+  #     - run: flyctl deploy --remote-only
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

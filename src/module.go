@@ -76,7 +76,7 @@ func (p *Prover) GenerateProof(c *gin.Context) {
 
 			// 1. Calculate witness
 			start := time.Now()
-			wasmBytes, err := os.ReadFile("./instruments/ProcessMessages_10-2-1-2_test.wasm")
+			wasmBytes, err := os.ReadFile("./instruments/ProcessMessages_6-8-2-3_test.wasm")
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
@@ -97,20 +97,20 @@ func (p *Prover) GenerateProof(c *gin.Context) {
 			}
 
 			//nolint:gomnd // PoC skip
-			err = os.WriteFile("./data/ProcessMessages/10-2-1-2/witness_wasm.wtns", wtns, 0600)
+			err = os.WriteFile("./data/ProcessMessages/6-8-2-3/witness_wasm.wtns", wtns, 0600)
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
 
 			elapsed := time.Since(start) // Calculate the elapsed time
-			fmt.Printf("Elapsed time for witness calculation 10-2-1-2 Processmessages: %s\n", elapsed)
+			fmt.Printf("Elapsed time for witness calculation 6-8-2-3 Processmessages: %s\n", elapsed)
 
 			// 2. Generate Proof
-			provingKey, err := os.ReadFile("./instruments/ProcessMessages_10-2-1-2_test.0.zkey")
+			provingKey, err := os.ReadFile("./instruments/ProcessMessages_6-8-2-3_test.0.zkey")
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
-			witnessOutput, err := os.ReadFile("./data/ProcessMessages/10-2-1-2/witness_wasm.wtns")
+			witnessOutput, err := os.ReadFile("./data/ProcessMessages/6-8-2-3/witness_wasm.wtns")
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
@@ -127,7 +127,7 @@ func (p *Prover) GenerateProof(c *gin.Context) {
 
 			elapsed = time.Since(start) // Calculate the elapsed time
 
-			fmt.Printf("Elapsed time for gen proof 10-2-1-2: %s\n", elapsed)
+			fmt.Printf("Elapsed time for gen proof 6-8-2-3: %s\n", elapsed)
 
 			p.ProcessMessagesCircuit.Status = ProofAvailable
 			fmt.Println("Proof available for ProcessMessages")
@@ -137,7 +137,7 @@ func (p *Prover) GenerateProof(c *gin.Context) {
 			p.TallyVotesCircuit.Status = GeneratingProof
 			// 1. Calculate witness
 			start := time.Now()
-			wasmBytes, err := os.ReadFile("./instruments/TallyVotes_10-1-2_test.wasm")
+			wasmBytes, err := os.ReadFile("./instruments/TallyVotes_6-2-3_test.wasm")
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
@@ -158,20 +158,20 @@ func (p *Prover) GenerateProof(c *gin.Context) {
 			}
 
 			//nolint:gomnd // PoC skip
-			err = os.WriteFile("./data/TallyVotes/10-1-2/witness_wasm.wtns", wtns, 0600)
+			err = os.WriteFile("./data/TallyVotes/6-2-3/witness_wasm.wtns", wtns, 0600)
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
 
 			elapsed := time.Since(start) // Calculate the elapsed time
-			fmt.Printf("Elapsed time for witness calculation 10-1-2 TallyVotes: %s\n", elapsed)
+			fmt.Printf("Elapsed time for witness calculation 6-2-3 TallyVotes: %s\n", elapsed)
 
 			// 2. Generate Proof
-			provingKey, err := os.ReadFile("./instruments/TallyVotes_10-1-2_test.0.zkey")
+			provingKey, err := os.ReadFile("./instruments/TallyVotes_6-2-3_test.0.zkey")
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
-			witnessOutput, err := os.ReadFile("./data/TallyVotes/10-1-2/witness_wasm.wtns")
+			witnessOutput, err := os.ReadFile("./data/TallyVotes/6-2-3/witness_wasm.wtns")
 			if err != nil {
 				fmt.Printf("err: %s", err)
 			}
@@ -188,7 +188,7 @@ func (p *Prover) GenerateProof(c *gin.Context) {
 
 			elapsed = time.Since(start) // Calculate the elapsed time
 
-			fmt.Printf("Elapsed time for gen proof 10-1-2 TallyVotes: %s\n", elapsed)
+			fmt.Printf("Elapsed time for gen proof 6-2-3 TallyVotes: %s\n", elapsed)
 
 			p.TallyVotesCircuit.Status = ProofAvailable
 			fmt.Println("Proof available for TallyVotes")
