@@ -29,5 +29,5 @@ curl http://localhost:8080/api/getResult
 ## Generate Proof using snarkjs
 
 ```
-snarkjs groth16 prove instruments/TallyVotes_10-1-2_test.0.zkey data/TallyVotes/10-1-2/witness_wasm.wtns outputs/proof_TallyVotes_10-1-2.json outputs/public_TallyVotes_10-1-2.json
+snarkjs groth16 prove instruments/TallyVotes_6-2-3_test.0.zkey data/TallyVotes/6-2-3/witness_wasm.wtns outputs/proof_TallyVotes_6-2-3.json outputs/public_TallyVotes_6-2-3.json
 ```
