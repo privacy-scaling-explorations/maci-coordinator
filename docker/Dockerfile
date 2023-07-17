@@ -48,6 +48,7 @@ RUN go mod download
 COPY . .
 
 # Generate a binary -- custom name to avoid collisions with existing files/directories
+# `-tags rapidsnark_asm` enables performance optimazation on x86_64 hardware (See https://github.com/iden3/go-rapidsnark/tree/main/prover#performance-optimization-on-x86_64-hardware)
 RUN go build -tags rapidsnark_asm -ldflags="-s -w" -trimpath -v -o "/builds/maci-coordinator"
 
 
