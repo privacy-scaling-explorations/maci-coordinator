@@ -1,7 +1,7 @@
 // specify an outlet
 
 import { HStack, Heading, Text, VStack } from "@chakra-ui/react";
-import { Component } from "react";
+// import { Component } from "react";
 import { Link, Outlet } from "react-router-dom";
 
 

@@ -7,23 +7,27 @@ import { AdminPage } from "./pages/AdminPage";
 import { SettingPage } from "./pages/SettingPage";
 
 import { Layout } from "./Layout";
+import { ApiProvider } from './context/ApiContext';
 
 function App() {
 
 
 	// make Path and layout
 	return (
-		<Router>
-			<Routes>
-				<Route path="/" element={<Layout />}>
-					<Route path="/admin" element={<AdminPage />} />
-					<Route path="/setting" element={<SettingPage />} />
+		//@ts-ignore
+		<ApiProvider>
+			<Router>
+				<Routes>
+					<Route path="/" element={<Layout />}>
+						<Route path="/admin" element={<AdminPage />} />
+						<Route path="/setting" element={<SettingPage />} />
 
-					<Route index element={<LandingPage />} />
+						<Route index element={<LandingPage />} />
 
-				</Route>
-			</Routes>
-		</Router>
+					</Route>
+				</Routes>
+			</Router>
+		</ApiProvider>
 	)
 }
 
