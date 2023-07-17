@@ -14,6 +14,7 @@ function App() {
 
 	// make Path and layout
 	return (
+		// state variables has defined in ApiContext.tsx
 		//@ts-ignore
 		<ApiProvider>
 			<Router>

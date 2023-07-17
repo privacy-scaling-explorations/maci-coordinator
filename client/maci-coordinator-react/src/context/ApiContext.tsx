@@ -91,7 +91,7 @@ const ApiContext = createContext<State>({
 	circuitName: '',
 	setcircuitName: () => null,
 	circuitInputProcessMessages: circuitInputProcessMessagesDefault
-	  ,
+	,
 	setcircuitInputProcessMessages: () => null,
 	circuitInputTallyVotes: circuitInputTallyVotesDefault,
 	setcircuitInputTallyVotes: () => null,
@@ -110,6 +110,7 @@ export const initializeApiContext = () => {
 
 	// actual API calls
 	// empty dependency array of useEffect means this will only run once
+	// when calling async inside useEffect, we need to define a function inside useEffect
 	useEffect(() => { console.log('initializeApiContext useEffect'); }, []);
 
 	return {
@@ -135,10 +136,15 @@ type ApiProviderProps = {
 
 // we are going to store all of the proofs that we fetch from the server in this context
 //@ts-ignore
-export const ApiProvider : React.FC<PropsWithChildren<ApiProviderProps>> = ({children}) => {
-    return children;
+export const ApiProvider: React.FC<PropsWithChildren<ApiProviderProps>> = ({ children }) => {
+	// call our hook
+	const state = initializeApiContext();
+
+
+	return <ApiContext.Provider value={{...state}}>{children}</ApiContext.Provider>;
 }
 
 
 
+// this is a custom hook that we will call in our components
 export const useApi = () => useContext(ApiContext);
