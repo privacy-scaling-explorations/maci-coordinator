@@ -15,6 +15,7 @@ const Layout: React.FC<React.PropsWithChildren<{}>> = () => {
 				<HStack spacing={4}>
 					<Text as={Link} to="/admin">Admin</Text>
 					<Text as={Link} to="/setting">Setting</Text>
+					<Text as={Link} to="/submit">Submit</Text>
 				</HStack>
 
 			</HStack>
