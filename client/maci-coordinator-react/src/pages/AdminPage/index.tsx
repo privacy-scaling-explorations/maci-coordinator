@@ -3,14 +3,14 @@ import { useApi } from "../../context/ApiContext";
 
 const AdminPage: React.FC<React.PropsWithChildren<{}>> = () => {
 	// it hooks into the context(state variables)
-	const { proofs, circuitName, circuitInputProcessMessages, circuitInputTallyVotes, isLoading, SendGenProofRequestToCoordinatorService,PollingGetProofFromCoordinatorService, GetStatusFromCoordinatorService, proverStateProcessMessages } = useApi();
+	const { proofs, circuitName, circuitInputProcessMessages, circuitInputTallyVotes, isLoading, GetStatusFromCoordinatorService, proverStateProcessMessages } = useApi();
 
 	useEffect(() => {
 		console.log('AdminPage useEffect');
 		// call the function
 		GetStatusFromCoordinatorService("ProcessMessages");
-		SendGenProofRequestToCoordinatorService("ProcessMessages", circuitInputProcessMessages);
-		PollingGetProofFromCoordinatorService("ProcessMessages");
+
+
 	}, []);
 	return <>
 		{/* display current prover status */}

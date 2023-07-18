@@ -105,7 +105,9 @@ const ApiContext = createContext<State>({
 	setcircuitName: () => null,
 	circuitInputProcessMessages: circuitInputProcessMessagesDefault
 	,
-	setcircuitInputProcessMessages: () => null,
+	// value is a function that takes in the previous state and returns the new state
+	// @ts-ignore
+	setcircuitInputProcessMessages: (value: (previousState: CircuitInputProcessMessages) => CircuitInputProcessMessages) => null,
 	circuitInputTallyVotes: circuitInputTallyVotesDefault,
 	setcircuitInputTallyVotes: () => null,
 	isLoading: false,
