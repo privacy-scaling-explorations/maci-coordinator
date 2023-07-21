@@ -1,5 +1,3 @@
-
-
 import { Button, HStack, Input, VStack } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import {  useApi } from '../../context/ApiContext';
