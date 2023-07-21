@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { circuitInputProcessMessagesDefault } from './circuitInputProcessMessagesDefault';
 import { circuitInputTallyVotesDefault } from './circuitInputTallyVotesDefault';
-// import { Text } from '@chakra-ui/react';
+import { proofDefault } from './proofProcessMessagesDefault';
 
 
 // define what the shape of our context wiil looks like
@@ -14,9 +14,9 @@ import { circuitInputTallyVotesDefault } from './circuitInputTallyVotesDefault';
 // 	"circuitInput": {JSON}
 // }
 export interface State {
-	proofs: Array<any>;
+	proofs: ProofProcessMessages;
 	// TODO: create proof type
-	setProofs: React.Dispatch<React.SetStateAction<Array<any>>>;
+	setProofs: React.Dispatch<React.SetStateAction<ProofProcessMessages>>;
 	circuitName: string;
 	setcircuitName: React.Dispatch<React.SetStateAction<string>>;
 
@@ -96,10 +96,19 @@ export interface CircuitInputTallyVotes {
 	"votes": Array<Array<string>>
 }
 
+// interface of proof of ProcessMessages
+export interface ProofProcessMessages {
+	"pi_a": Array<bigint>,
+	"pi_b": Array<Array<bigint>>,
+	"pi_c": Array<bigint>,
+	"publicInput": Array<bigint>
+}
+
+
 const API_URL = "http://localhost:8080";
 
 const ApiContext = createContext<State>({
-	proofs: [],
+	proofs: proofDefault,
 	setProofs: () => null,
 	circuitName: '',
 	setcircuitName: () => null,
@@ -126,7 +135,7 @@ export const initializeApiContext = () => {
 	const [circuitName, setcircuitName] = useState<string>("ProcessMessages")
 	const [circuitInputProcessMessages, setcircuitInputProcessMessages] = useState<CircuitInputProcessMessages>(circuitInputProcessMessagesDefault)
 	const [circuitInputTallyVotes, setcircuitInputTallyVotes] = useState<CircuitInputTallyVotes>(circuitInputTallyVotesDefault)
-	const [proofs, setProofs] = useState<Array<any>>([]);
+	const [proofs, setProofs] = useState<ProofProcessMessages>(proofDefault);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [proverStateProcessMessages, setProverStateProcessMessages] = useState<string>("");
 	const [proverStateTallyVotes, setProverStateTallyVotes] = useState<string>("");
@@ -174,7 +183,7 @@ export const initializeApiContext = () => {
 			console.log("Polling " + count + " times");
 			console.log("Elapsed time: " + (end - start) / 1000 + " seconds");
 
-			const proof: Array<any> = JSON.parse(response.data.data[circuit].result.proof);
+			const proof: ProofProcessMessages = JSON.parse(response.data.data[circuit].result.proof);
 			const publicInputs = JSON.parse(response.data.data[circuit].result.publicInput);
 			const status = response.data.data[circuit].status;
 			console.log("Prover status: " + status);
@@ -265,8 +274,6 @@ export const initializeApiContext = () => {
 export const ApiProvider: React.Context<State> = ({ children }) => {
 	// call our hook
 	const state = initializeApiContext();
-
-
 
 
 	return <ApiContext.Provider value={{ ...state }}>{children}</ApiContext.Provider>;
