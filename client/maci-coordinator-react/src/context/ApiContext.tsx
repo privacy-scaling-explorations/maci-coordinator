@@ -6,6 +6,10 @@ import { circuitInputTallyVotesDefault } from './circuitInputTallyVotesDefault';
 import { proofDefault } from './proofProcessMessagesDefault';
 
 
+// circuit names:
+// ProcessMessages
+// TallyVotes
+
 // define what the shape of our context wiil looks like
 //
 // Request body of /generateProof to the server
@@ -31,7 +35,10 @@ export interface State {
 	isLoading: boolean;
 	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 
+	CheckCoordinatorService: () => Promise<boolean>;
+
 	// function to send request to the server
+	GenMultipleProofs: (_circuitName: string, _circuitInputArray: Array<any>) => void;
 
 	// TODO; knock in down later
 	SendGenProofRequestToCoordinatorService: (circuitName: string, circuitInput: any) => void;
@@ -121,6 +128,8 @@ const ApiContext = createContext<State>({
 	setcircuitInputTallyVotes: () => null,
 	isLoading: false,
 	setIsLoading: () => null,
+	CheckCoordinatorService: () => Promise.resolve(false),
+	GenMultipleProofs: (_circuitName: string, _circuitInputArray: Array<CircuitInputProcessMessages>) => null,
 	SendGenProofRequestToCoordinatorService: (_circuitName: string, _circuitInput: any) => null,
 	PollingGetProofFromCoordinatorService: (_circuitName: string) => null,
 	GetStatusFromCoordinatorService: (_circuitName: string) => null,
@@ -130,7 +139,7 @@ const ApiContext = createContext<State>({
 	setProverStateTallyVotes: () => null,
 });
 
-export const initializeApiContext = () => {
+export const InitializeApiContext = () => {
 	// create all of the context hooks
 	const [circuitName, setcircuitName] = useState<string>("ProcessMessages")
 	const [circuitInputProcessMessages, setcircuitInputProcessMessages] = useState<CircuitInputProcessMessages>(circuitInputProcessMessagesDefault)
@@ -141,7 +150,42 @@ export const initializeApiContext = () => {
 	const [proverStateTallyVotes, setProverStateTallyVotes] = useState<string>("");
 
 
+
 	// API calls
+	const CheckCoordinatorService = async () => {
+
+		try {
+			const response = await fetch(`${API_URL}/api/getResult`);
+			console.log(`coordinator service is running: ${response}`)
+		} catch (error) {
+			console.log(`coordinator service is not running: ${error}`)
+			throw error;
+		}
+
+		return true;
+	}
+
+	const GenMultipleProofs = async (circuitName: string, circuitInput: Array<any>) => {
+		console.log("#################")
+		console.log("#################")
+		console.log("#################")
+		console.log("#################")
+		console.log("Start GenMultipleProofs")
+
+		//measure elapsed time
+		const start = performance.now();
+		for (let i = 0; i < circuitInput.length; i++) {
+			console.log(`Start GenProof ${i}`)
+			await SendGenProofRequestToCoordinatorService(circuitName, circuitInput[i]);
+			await PollingGetProofFromCoordinatorService(circuitName);
+			console.log(`End GenProof ${i}`)
+		}
+		const end = performance.now();
+
+		console.log("elapsed time", (end - start) / 1000, + " seconds")
+
+	}
+
 	const SendGenProofRequestToCoordinatorService = async (circuitName: string, circuitInput: any) => {
 		setIsLoading(true);
 		try {
@@ -238,7 +282,13 @@ export const initializeApiContext = () => {
 
 	// empty dependency array of useEffect means this will only run once
 	// when calling async inside useEffect, we need to define a function inside useEffect
-	useEffect(() => { console.log('initializeApiContext useEffect'); }, []);
+	useEffect(() => {
+		console.log('initializeApiContext useEffect');
+		// const getStatus = async () => {
+		// 	await GetStatusFromCoordinatorService("ProcessMessages");
+		// };
+		// getStatus();
+	}, []);
 
 	return {
 		proofs,
@@ -251,6 +301,8 @@ export const initializeApiContext = () => {
 		setcircuitInputTallyVotes,
 		isLoading,
 		setIsLoading,
+		CheckCoordinatorService,
+		GenMultipleProofs,
 		SendGenProofRequestToCoordinatorService,
 		PollingGetProofFromCoordinatorService,
 		GetStatusFromCoordinatorService,
@@ -273,7 +325,7 @@ export const initializeApiContext = () => {
 //@ts-ignore
 export const ApiProvider: React.Context<State> = ({ children }) => {
 	// call our hook
-	const state = initializeApiContext();
+	const state = InitializeApiContext();
 
 
 	return <ApiContext.Provider value={{ ...state }}>{children}</ApiContext.Provider>;

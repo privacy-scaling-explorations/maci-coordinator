@@ -1,16 +1,16 @@
 
 
-import { Button, HStack, Text, VStack } from '@chakra-ui/react';
+import { Button, Text, VStack } from '@chakra-ui/react';
 // import React, { useEffect, useState } from 'react';
 import { useApi } from '../../context/ApiContext';
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
-import { useContractRead } from 'wagmi';
+// import { useContractRead } from 'wagmi';
 
 
-import { verifierContractABI } from './verifierContractABI';
-import { useState } from 'react';
+// import { verifierContractABI } from './verifierContractABI';
+// import { useState } from 'react';
 
 // import { VerifyingKey } from 'maci-domainobjs'
 
@@ -31,7 +31,7 @@ const SubmitPage: React.FC<React.PropsWithChildren<{}>> = () => {
 	console.log("------SubmitPage mounted-----")
 	// it hooks into the context(state variables)
 	const { proofs, proverStateProcessMessages } = useApi();
-	const verifierContractAddress = '0x'
+	// const verifierContractAddress = '0x'
 
 
 	// const [verifyProofData, setVerifyProofData] = useState<any>(null);
@@ -60,9 +60,9 @@ const SubmitPage: React.FC<React.PropsWithChildren<{}>> = () => {
 
 
 
-	const handleSomething = () => {
-		console.log("handleSomething");
-	};
+	// const handleSomething = () => {
+	// 	console.log("handleSomething");
+	// };
 
 	return (
 		<VStack>
