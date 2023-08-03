@@ -1,62 +1,184 @@
-import { Button, HStack, Input, VStack } from '@chakra-ui/react';
-import React, { useState } from 'react';
-import {  useApi } from '../../context/ApiContext';
+import { Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useApi } from '../../context/ApiContext';
 
 const SettingPage: React.FC<React.PropsWithChildren<{}>> = () => {
-  const [file, setFile] = useState();
+	const [processMessagesFile, setProcessMessagesFile]: any = useState();
+	const [tallyVotesFile, setTallyVotesFile]: any = useState();
 
-  // set circuitInputProcessMessages from api context
-  const { proverStateProcessMessages, circuitInputProcessMessages, setcircuitInputProcessMessages, SendGenProofRequestToCoordinatorService, PollingGetProofFromCoordinatorService } = useApi();
+	const [processMessagesUploaded, setProcessMessagesUploaded] = useState(false);
+const [tallyVotesUploaded, setTallyVotesUploaded] = useState(false);
+const [allProofsGenerated, setAllProofsGenerated] = useState(false);
 
-  console.log("[Setting page] proverstate: ", proverStateProcessMessages)
+	const [status, setStatus] = useState({
+		ProcessMessages: { state: "Pending", startTime: new Date, endTime: new Date },
+		TallyVotes: { state: "Pending", startTime: new Date, endTime: new Date },
+	});
+	const [totalTime, setTotalTime] = useState(0);
+    const timerRef: any = useRef();
 
-  const handleFileChange = (event: any) => {
-    setFile(event.target.files[0]);
-  };
+	useEffect(() => {
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+            }
+        }
+    }, []);
 
-const handleSubmit = () => {
-	if (file) {
-		const reader = new FileReader();
-		reader.onload = function(evt) {
-			try {
-				const json = JSON.parse(evt.target?.result as string);
-				console.log(json); // Replace this with whatever you want to do with the JSON
+	const { proverStateProcessMessages, circuitInputProcessMessages, setcircuitInputProcessMessages, circuitInputTallyVotes, setcircuitInputTallyVotes, SendGenProofRequestToCoordinatorService, PollingGetProofFromCoordinatorService } = useApi();
 
-				setcircuitInputProcessMessages(json);
-			} catch (err) {
-				alert(`The uploaded file is not valid JSON: ${err}`);
-			}
-		};
-		reader.readAsText(file);
-	} else {
-		alert('No file selected');
-	}
-};
+	console.log("[Setting page] proverstate: ", proverStateProcessMessages)
 
-const handleGenProof = () => {
+	const handleProcessMessagesFileChange = (event: any) => {
+		setProcessMessagesFile(event.target.files[0]);
+	};
 
-			try {
-				SendGenProofRequestToCoordinatorService("ProcessMessages", circuitInputProcessMessages);
-				PollingGetProofFromCoordinatorService("ProcessMessages");
-			} catch (err) {
-				alert(`Failed to generate proof: ${err}`);
-			}
+	const handleTallyVotesFileChange = (event: any) => {
+		setTallyVotesFile(event.target.files[0]);
+	};
 
-};
+	const handleProcessMessagesUpload = () => {
+		if (processMessagesFile) {
+			const reader = new FileReader();
+			reader.onload = function (evt) {
+				try {
+					const json = JSON.parse(evt.target?.result as string);
+					// read file name
+					const fileName = processMessagesFile.name;
+					console.log("file name: ", fileName);
+					console.log(json); // Replace this with whatever you want to do with the JSON
 
-  return (
-	<VStack>
-		<HStack alignSelf="stretch" justifyContent="space-between" minH={"42px"} alignItems={"center"} spacing={10}>
-			<Input type="file" onChange={handleFileChange} size="md" />
-			<Button onClick={handleSubmit}>Submit</Button>
-		</HStack>
-		<Button onClick={handleGenProof}>Gen Proof</Button>
-	</VStack>
+					setcircuitInputProcessMessages(json);
+					setProcessMessagesUploaded(true);
 
-  );
+
+				} catch (err) {
+					alert(`The uploaded file is not valid JSON: ${err}`);
+				}
+			};
+			reader.readAsText(processMessagesFile);
+		} else {
+			alert('No file selected');
+		}
+	};
+
+	const handleTallyVotesUpload = () => {
+		if (tallyVotesFile) {
+			const reader = new FileReader();
+			reader.onload = function (evt) {
+				try {
+					const json = JSON.parse(evt.target?.result as string);
+					// read file name
+					const fileName = tallyVotesFile.name;
+					console.log("file name: ", fileName);
+					console.log(json); // Replace this with whatever you want to do with the JSON
+
+					setcircuitInputTallyVotes(json);
+					setTallyVotesUploaded(true);
+
+				} catch (err) {
+					alert(`The uploaded file is not valid JSON: ${err}`);
+				}
+			};
+			reader.readAsText(tallyVotesFile);
+		} else {
+			alert('No file selected');
+		}
+	};
+
+	const handleGenProof = async () => {
+		try {
+			// Measure total time
+			setTotalTime(0);
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+            }
+            timerRef.current = setInterval(() => {
+                setTotalTime(prevTime => prevTime + 1);
+            }, 1000);
+
+
+			setStatus(prevStatus => ({
+				...prevStatus,
+				ProcessMessages: { ...prevStatus.ProcessMessages, state: '⚙️ Generating...' },
+			}));
+
+			await SendGenProofRequestToCoordinatorService("ProcessMessages", circuitInputProcessMessages);
+			await PollingGetProofFromCoordinatorService("ProcessMessages");
+
+			setStatus(prevStatus => ({
+    ...prevStatus,
+    ProcessMessages: { ...prevStatus.ProcessMessages, state: '✅', endTime: new Date() },
+    TallyVotes: { ...prevStatus.TallyVotes, state: '⚙️ Generating...' },
+}));
+
+			await SendGenProofRequestToCoordinatorService("TallyVotes", circuitInputTallyVotes);
+			await PollingGetProofFromCoordinatorService("TallyVotes");
+			setStatus(prevStatus => ({
+				...prevStatus,
+				TallyVotes: { ...prevStatus.TallyVotes, state: '✅', endTime: new Date() },
+			}));
+
+			setAllProofsGenerated(true);
+
+			// Stop timer
+			if (timerRef.current) {
+                clearInterval(timerRef.current);
+            }
+		} catch (err) {
+			alert(`Failed to generate proof: ${err}`);
+		}
+	};
+
+	const getTimeElapsed = (start: any, end: any) => {
+		if (!start || !end) return "N/A";
+		const timeElapsed = end - start;
+		return (timeElapsed / 1000).toFixed(2) + " seconds";
+	};
+
+	return (
+		<VStack spacing={10}>
+			<Text fontSize="2xl" fontWeight="bold">Upload circuit input</Text>
+
+			<VStack>
+				<Text fontSize="xl" fontWeight="bold">ProcessMessages</Text>
+				<HStack alignSelf="stretch" justifyContent="space-between" minH={"42px"} alignItems={"center"} spacing={2}>
+					<Input type="file" onChange={handleProcessMessagesFileChange} size="md" />
+					<Button onClick={handleProcessMessagesUpload}>Upload</Button>
+					<Text>{processMessagesUploaded ? '👍' : '🤔'}</Text>
+				</HStack>
+				<Text>Status: {status.ProcessMessages.state}</Text>
+				<Text>Elapsed Time: {getTimeElapsed(status.ProcessMessages.startTime, status.ProcessMessages.endTime)}</Text>
+			</VStack>
+
+			<VStack>
+				<Text fontSize="xl" fontWeight="bold">TallyVotes</Text>
+				<HStack alignSelf="stretch" justifyContent="space-between" minH={"42px"} alignItems={"center"} spacing={2}>
+					<Input type="file" onChange={handleTallyVotesFileChange} size="md" />
+					<Button onClick={handleTallyVotesUpload}>Upload</Button>
+					<Text>{tallyVotesUploaded ? '👍' : '🤔'}</Text>
+				</HStack>
+				<Text>Status: {status.TallyVotes.state}</Text>
+				<Text>Elapsed Time: {getTimeElapsed(status.TallyVotes.startTime, status.TallyVotes.endTime)}</Text>
+			</VStack>
+
+			{/* Just for spacing */}
+			<Text></Text>
+			<Text></Text>
+			<Text></Text>
+			<Text></Text>
+
+			<VStack>
+			<Button onClick={handleGenProof}>Gen Proof</Button>
+			<Text>Total Elapsed Time: {totalTime} seconds</Text>
+			<HStack>
+				<Text>Proofs Ready?</Text>
+				<Text>{allProofsGenerated ? '🙆‍♂️' : '🙅‍♂️'}</Text>
+			</HStack>
+			</VStack>
+
+		</VStack>
+	);
 }
-
-
-
 
 export { SettingPage };

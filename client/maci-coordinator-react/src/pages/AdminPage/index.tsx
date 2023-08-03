@@ -1,23 +1,26 @@
 // import { useEffect } from "react";
 import { useApi } from "../../context/ApiContext";
 
+import { circuitInputProcessMessagesArray } from "../../context/circuit_inputs/pm_6-8-2-3";
 import { circuitInputTallyVotesArray } from "../../context/circuit_inputs/tv_6-2-3";
 import { Button } from "@chakra-ui/react";
 
 const AdminPage: React.FC<React.PropsWithChildren<{}>> = () => {
 	// it hooks into the context(state variables)
-	const { proofs, circuitName, circuitInputProcessMessages, circuitInputTallyVotes, isLoading,  proverStateProcessMessages, CheckCoordinatorService, GenMultipleProofs  } = useApi();
+	const { circuitName, circuitInputProcessMessages, circuitInputTallyVotes, isLoading,  proverStateProcessMessages, CheckCoordinatorService, GenMultipleProofs  } = useApi();
 
 
 	// Print out the circuitInputTallyVotesArray
-	console.log("length of circuitInputTallyVotesArray: ", circuitInputTallyVotesArray.length);
 	console.log("circuitInputTallyVotesArray: ", circuitInputTallyVotesArray);
 
 
 
-	const handleGenProof = () => {
+	const handleGenProof = async () => {
 		try {
-			GenMultipleProofs("TallyVotes", circuitInputTallyVotesArray)
+			await CheckCoordinatorService();
+			GenMultipleProofs("ProcessMessages", circuitInputProcessMessagesArray)
+			// GenMultipleProofs("TallyVotes", circuitInputTallyVotesArray)
+
 		} catch (err) {
 			alert(`Failed to generate proof: ${err}`);
 		}
@@ -25,9 +28,9 @@ const AdminPage: React.FC<React.PropsWithChildren<{}>> = () => {
 
 const handleCheckCoordinatorService = async () => {
 	try {
-		await CheckCoordinatorService();
+		console.log("CheckCoordinatorService: ", await CheckCoordinatorService())
 	} catch (err) {
-		console.log(`Failed to check: ${err}`);
+		console.log(`${err}`);
 	}
 };
 
@@ -42,7 +45,7 @@ const handleCheckCoordinatorService = async () => {
 		<Button onClick={handleGenProof}>Gen Multiple Proof</Button>
 
 		{/* render all vars */}
-		<div>proofs: {JSON.stringify(proofs, null, 2)}</div>
+		{/* <div>proofs: {JSON.stringify(proofs, null, 2)}</div> */}
 
 
 		<div>circuitName: {circuitName}</div>

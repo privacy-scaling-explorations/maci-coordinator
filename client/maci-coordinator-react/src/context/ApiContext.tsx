@@ -153,16 +153,17 @@ export const InitializeApiContext = () => {
 
 	// API calls
 	const CheckCoordinatorService = async () => {
-
 		try {
 			const response = await fetch(`${API_URL}/api/getResult`);
-			console.log(`coordinator service is running: ${response}`)
+			if (response.ok) {
+				return true;
+			} else {
+				console.log(`status code of GET request for ${API_URL}/api/getResult is not 200: ${response.status}`)
+				return false;
+			}
 		} catch (error) {
-			console.log(`coordinator service is not running: ${error}`)
-			throw error;
+			throw new Error(`failed to get a result from ${API_URL}/api/getResult: ${error}`);
 		}
-
-		return true;
 	}
 
 	const GenMultipleProofs = async (circuitName: string, circuitInput: Array<any>) => {
@@ -193,7 +194,8 @@ export const InitializeApiContext = () => {
 			// console.log("circuitInput", circuitInput)
 			const response = await axios.post(`${API_URL}/api/generateProof`, { "circuitName": circuitName, "circuitInput": circuitInput });
 
-			setProofs(response.data);
+			console.log(`${API_URL}/api/generateProof response: ${response.status} ${response.statusText}`)
+
 		} catch (error) {
 			console.error(error);
 		}
@@ -202,29 +204,30 @@ export const InitializeApiContext = () => {
 
 	const PollingGetProofFromCoordinatorService = async (circuitName: string) => {
 		setIsLoading(true);
+
+		let circuit = "";
+		if (circuitName === "ProcessMessages") {
+			circuit = "processMessagesCircuit";
+		} else if (circuitName === "TallyVotes") {
+			circuit = "tallyVotesCircuit";
+		} else {
+			throw new Error("Invalid circuit name");
+		}
+
 		try {
 			let response = await axios.get(`${API_URL}/api/getResult`);
-			let count = 0;
 			let start = Date.now();
 
 
-			let circuit = "";
-			if (circuitName === "ProcessMessages") {
-				circuit = "processMessagesCircuit";
-			} else if (circuitName === "TallyVotes") {
-				circuit = "tallyVotesCircuit";
-			} else {
-				throw new Error("Invalid circuit name");
-			}
-
 			// poll the coordinator until the proof is available
+
 			while (response.data.data[circuit].status !== "ProofAvailable") {
 				response = await axios.get(`${API_URL}/api/getResult`);
-				count++;
+
+				console.log(`Waiting for proof generation... [${(Date.now() - start) / 1000} seconds]`);
 				await new Promise(r => setTimeout(r, 1000));
 			}
 			let end = Date.now();
-			console.log("Polling " + count + " times");
 			console.log("Elapsed time: " + (end - start) / 1000 + " seconds");
 
 			const proof: ProofProcessMessages = JSON.parse(response.data.data[circuit].result.proof);
