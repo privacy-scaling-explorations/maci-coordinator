@@ -1,31 +1,33 @@
-import { Button, HStack, Input, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Code, HStack, Input, Text, VStack } from '@chakra-ui/react';
 import React, { useState, useRef, useEffect } from 'react';
-import { useApi } from '../../context/ApiContext';
+import { useApi, MACIProofs } from '../../context/ApiContext';
 
 const SettingPage: React.FC<React.PropsWithChildren<{}>> = () => {
 	const [processMessagesFile, setProcessMessagesFile]: any = useState();
 	const [tallyVotesFile, setTallyVotesFile]: any = useState();
 
 	const [processMessagesUploaded, setProcessMessagesUploaded] = useState(false);
-const [tallyVotesUploaded, setTallyVotesUploaded] = useState(false);
-const [allProofsGenerated, setAllProofsGenerated] = useState(false);
+	const [tallyVotesUploaded, setTallyVotesUploaded] = useState(false);
+	const [allProofsGenerated, setAllProofsGenerated] = useState(false);
+	const [proofData, setProofData] = useState(null as MACIProofs | null);
+
 
 	const [status, setStatus] = useState({
 		ProcessMessages: { state: "Pending", startTime: new Date, endTime: new Date },
 		TallyVotes: { state: "Pending", startTime: new Date, endTime: new Date },
 	});
 	const [totalTime, setTotalTime] = useState(0);
-    const timerRef: any = useRef();
+	const timerRef: any = useRef();
 
 	useEffect(() => {
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-        }
-    }, []);
+		return () => {
+			if (timerRef.current) {
+				clearInterval(timerRef.current);
+			}
+		}
+	}, []);
 
-	const { proverStateProcessMessages, circuitInputProcessMessages, setcircuitInputProcessMessages, circuitInputTallyVotes, setcircuitInputTallyVotes, SendGenProofRequestToCoordinatorService, PollingGetProofFromCoordinatorService } = useApi();
+	const { getProofs, proverStateProcessMessages, circuitInputProcessMessages, setcircuitInputProcessMessages, circuitInputTallyVotes, setcircuitInputTallyVotes, SendGenProofRequestToCoordinatorService, GetProofsFromCoordinatorService, PollingGetProofFromCoordinatorService } = useApi();
 
 	console.log("[Setting page] proverstate: ", proverStateProcessMessages)
 
@@ -90,12 +92,12 @@ const [allProofsGenerated, setAllProofsGenerated] = useState(false);
 		try {
 			// Measure total time
 			setTotalTime(0);
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-            timerRef.current = setInterval(() => {
-                setTotalTime(prevTime => prevTime + 1);
-            }, 1000);
+			if (timerRef.current) {
+				clearInterval(timerRef.current);
+			}
+			timerRef.current = setInterval(() => {
+				setTotalTime(prevTime => prevTime + 1);
+			}, 1000);
 
 
 			setStatus(prevStatus => ({
@@ -107,10 +109,10 @@ const [allProofsGenerated, setAllProofsGenerated] = useState(false);
 			await PollingGetProofFromCoordinatorService("ProcessMessages");
 
 			setStatus(prevStatus => ({
-    ...prevStatus,
-    ProcessMessages: { ...prevStatus.ProcessMessages, state: '✅', endTime: new Date() },
-    TallyVotes: { ...prevStatus.TallyVotes, state: '⚙️ Generating...' },
-}));
+				...prevStatus,
+				ProcessMessages: { ...prevStatus.ProcessMessages, state: '✅', endTime: new Date() },
+				TallyVotes: { ...prevStatus.TallyVotes, state: '⚙️ Generating...' },
+			}));
 
 			await SendGenProofRequestToCoordinatorService("TallyVotes", circuitInputTallyVotes);
 			await PollingGetProofFromCoordinatorService("TallyVotes");
@@ -119,14 +121,26 @@ const [allProofsGenerated, setAllProofsGenerated] = useState(false);
 				TallyVotes: { ...prevStatus.TallyVotes, state: '✅', endTime: new Date() },
 			}));
 
-			setAllProofsGenerated(true);
-
 			// Stop timer
 			if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
+				clearInterval(timerRef.current);
+			}
+
+			setAllProofsGenerated(true);
+			await showGeneratedProofs();
+
 		} catch (err) {
 			alert(`Failed to generate proof: ${err}`);
+		}
+	};
+
+	const showGeneratedProofs = async () => {
+		try {
+			await GetProofsFromCoordinatorService();
+			const proofs = getProofs();
+			setProofData(proofs);
+		} catch (err) {
+			alert(`Failed to get proof: ${err}`);
 		}
 	};
 
@@ -169,14 +183,19 @@ const [allProofsGenerated, setAllProofsGenerated] = useState(false);
 			<Text></Text>
 
 			<VStack>
-			<Button onClick={handleGenProof}>Gen Proof</Button>
-			<Text>Total Elapsed Time: {totalTime} seconds</Text>
-			<HStack>
-				<Text>Proofs Ready?</Text>
-				<Text>{allProofsGenerated ? '🙆‍♂️' : '🙅‍♂️'}</Text>
-			</HStack>
+				<Button onClick={handleGenProof}>Gen Proof</Button>
+				<Text>Total Elapsed Time: {totalTime} seconds</Text>
+				<HStack>
+					<Text>Proofs Ready?</Text>
+					<Text>{allProofsGenerated ? '🙆‍♂️' : '🙅‍♂️'}</Text>
+				</HStack>
+				<Box width="300%" height="400px" overflow="auto" p={4} color="white" bg="teal.500">
+						<Code display="block" whiteSpace="pre" overflowX="auto">
+							{proofData ? JSON.stringify(proofData, null, 2) : 'No data yet'}
+						</Code>
+				</Box>
 			</VStack>
-
+			<Button onClick={showGeneratedProofs}>Get Proof</Button>
 		</VStack>
 	);
 }

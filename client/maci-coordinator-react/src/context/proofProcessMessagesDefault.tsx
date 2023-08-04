@@ -1,7 +1,7 @@
-import { ProofProcessMessages } from './ApiContext';
+import { Groth16Proof } from './ApiContext';
 
 
-export const proofDefault: ProofProcessMessages = {
+export const proofDefault: Groth16Proof = {
         "pi_a": [
             12520018489046951501029150789048025461684834203729164680761548473772854073521n,
             12975535289067267036945293634093223850502160665624817650218881706599974115195n

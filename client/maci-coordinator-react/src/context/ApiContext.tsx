@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { circuitInputProcessMessagesDefault } from './circuitInputProcessMessagesDefault';
 import { circuitInputTallyVotesDefault } from './circuitInputTallyVotesDefault';
-import { proofDefault } from './proofProcessMessagesDefault';
 
 
 // circuit names:
@@ -18,9 +17,11 @@ import { proofDefault } from './proofProcessMessagesDefault';
 // 	"circuitInput": {JSON}
 // }
 export interface State {
-	proofs: ProofProcessMessages;
+	// TODO: assgin right type
+	proofs: MACIProofs;
 	// TODO: create proof type
-	setProofs: React.Dispatch<React.SetStateAction<ProofProcessMessages>>;
+	setProofs: React.Dispatch<React.SetStateAction<MACIProofs>>;
+	getProofs: () => MACIProofs;
 	circuitName: string;
 	setcircuitName: React.Dispatch<React.SetStateAction<string>>;
 
@@ -44,6 +45,7 @@ export interface State {
 	SendGenProofRequestToCoordinatorService: (circuitName: string, circuitInput: any) => void;
 	PollingGetProofFromCoordinatorService: (_circuitName: string) => void;
 	GetStatusFromCoordinatorService: (circuitName: string) => void;
+	GetProofsFromCoordinatorService: () => void;
 
 	proverStateProcessMessages: string;
 	setProverStateProcessMessages: React.Dispatch<React.SetStateAction<string>>;
@@ -103,27 +105,37 @@ export interface CircuitInputTallyVotes {
 	"votes": Array<Array<string>>
 }
 
-// interface of proof of ProcessMessages
-export interface ProofProcessMessages {
+export interface Groth16Proof {
 	"pi_a": Array<bigint>,
 	"pi_b": Array<Array<bigint>>,
 	"pi_c": Array<bigint>,
 	"publicInput": Array<bigint>
 }
 
+export interface MACIProofs {
+	"ProcessMessages": Array<Groth16Proof>,
+	"TallyVotes": Array<Groth16Proof>
+}
+
+//
+const emptyMACIProofs: MACIProofs = {
+	"ProcessMessages": [],
+	"TallyVotes": []
+}
 
 const API_URL = "http://localhost:8080";
 
 const ApiContext = createContext<State>({
-	proofs: proofDefault,
+	proofs: emptyMACIProofs,
 	setProofs: () => null,
+	getProofs: () => emptyMACIProofs,
 	circuitName: '',
 	setcircuitName: () => null,
 	circuitInputProcessMessages: circuitInputProcessMessagesDefault
 	,
 	// value is a function that takes in the previous state and returns the new state
 	// @ts-ignore
-	setcircuitInputProcessMessages: (value: (previousState: CircuitInputProcessMessages) => CircuitInputProcessMessages) => null,
+	setcircuitInputProcessMessages: () => null,
 	circuitInputTallyVotes: circuitInputTallyVotesDefault,
 	setcircuitInputTallyVotes: () => null,
 	isLoading: false,
@@ -133,6 +145,7 @@ const ApiContext = createContext<State>({
 	SendGenProofRequestToCoordinatorService: (_circuitName: string, _circuitInput: any) => null,
 	PollingGetProofFromCoordinatorService: (_circuitName: string) => null,
 	GetStatusFromCoordinatorService: (_circuitName: string) => null,
+	GetProofsFromCoordinatorService: () => null,
 	proverStateProcessMessages: '',
 	setProverStateProcessMessages: () => null,
 	proverStateTallyVotes: '',
@@ -144,7 +157,7 @@ export const InitializeApiContext = () => {
 	const [circuitName, setcircuitName] = useState<string>("ProcessMessages")
 	const [circuitInputProcessMessages, setcircuitInputProcessMessages] = useState<CircuitInputProcessMessages>(circuitInputProcessMessagesDefault)
 	const [circuitInputTallyVotes, setcircuitInputTallyVotes] = useState<CircuitInputTallyVotes>(circuitInputTallyVotesDefault)
-	const [proofs, setProofs] = useState<ProofProcessMessages>(proofDefault);
+	const [proofs, setProofs] = useState<MACIProofs>(emptyMACIProofs);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [proverStateProcessMessages, setProverStateProcessMessages] = useState<string>("");
 	const [proverStateTallyVotes, setProverStateTallyVotes] = useState<string>("");
@@ -230,12 +243,12 @@ export const InitializeApiContext = () => {
 			let end = Date.now();
 			console.log("Elapsed time: " + (end - start) / 1000 + " seconds");
 
-			const proof: ProofProcessMessages = JSON.parse(response.data.data[circuit].result.proof);
+			const proof: Groth16Proof = JSON.parse(response.data.data[circuit].result.proof);
 			const publicInputs = JSON.parse(response.data.data[circuit].result.publicInput);
 			const status = response.data.data[circuit].status;
 			console.log("Prover status: " + status);
 			console.log("publicInput: " + publicInputs);
-			setProofs(proof);
+			console.log("proof: " + proof);
 		} catch (error) {
 			console.error(error);
 		}
@@ -283,6 +296,58 @@ export const InitializeApiContext = () => {
 		}
 	};
 
+	const GetProofsFromCoordinatorService = async () => {
+		try {
+			const _proofs: MACIProofs = {
+				ProcessMessages: Array<Groth16Proof>(),
+				TallyVotes: Array<Groth16Proof>()
+			};
+
+			let response = await axios.get(`${API_URL}/api/getResult`);
+
+			const proofProcessMessages: Groth16Proof = JSON.parse(response.data.data.processMessagesCircuit.result.proof);
+			const publicInputsProcessMessages = JSON.parse(response.data.data.processMessagesCircuit.result.publicInput);
+			const statusProcessMessages = response.data.data.processMessagesCircuit.status;
+			console.log("#################")
+			console.log("#################")
+			console.log("Prover status: " + statusProcessMessages);
+			console.log("publicInput: " + publicInputsProcessMessages);
+
+			proofProcessMessages.publicInput = publicInputsProcessMessages;
+			console.log("#################")
+			console.log("#################")
+			console.log("proofProcessMessages: " + JSON.stringify(proofProcessMessages));
+			_proofs.ProcessMessages.push(proofProcessMessages);
+
+			console.log("$$$$$$$$$$$")
+			console.log("$$$$$$$$$$$")
+
+
+			const proofTallyVotes: Groth16Proof = JSON.parse(response.data.data.tallyVotesCircuit.result.proof);
+			const publicInputsTallyVotes = JSON.parse(response.data.data.tallyVotesCircuit.result.publicInput);
+			console.log("#################")
+			console.log("#################")
+			const statusTallyVotes = response.data.data.tallyVotesCircuit.status;
+			console.log("Prover status: " + statusTallyVotes);
+			console.log("publicInput: " + publicInputsTallyVotes);
+
+			console.log("#################")
+			console.log("#################")
+			proofTallyVotes.publicInput = publicInputsTallyVotes;
+			console.log("proofTallyVotes: " + JSON.stringify(proofTallyVotes));
+			_proofs.TallyVotes.push(proofTallyVotes);
+
+			setProofs(_proofs);
+			// console.log(`proofs: ${JSON.stringify(_proofs)}`);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	const getProofs = () => {
+		return proofs;
+	}
+
 	// empty dependency array of useEffect means this will only run once
 	// when calling async inside useEffect, we need to define a function inside useEffect
 	useEffect(() => {
@@ -296,6 +361,7 @@ export const InitializeApiContext = () => {
 	return {
 		proofs,
 		setProofs,
+		getProofs,
 		circuitName,
 		setcircuitName,
 		circuitInputProcessMessages,
@@ -309,6 +375,7 @@ export const InitializeApiContext = () => {
 		SendGenProofRequestToCoordinatorService,
 		PollingGetProofFromCoordinatorService,
 		GetStatusFromCoordinatorService,
+		GetProofsFromCoordinatorService,
 		proverStateProcessMessages,
 		setProverStateProcessMessages,
 		proverStateTallyVotes,
