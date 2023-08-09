@@ -19,12 +19,13 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import {
-	foundry
+	hardhat
 } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
-const { chains, publicClient } = configureChains(
-	[foundry],
+const { chains, publicClient  } = configureChains(
+	[hardhat],
 	[
 		publicProvider()
 	]

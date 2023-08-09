@@ -1,5 +1,9 @@
+import {VerifyingKey} from "maci-domainobjs";
 
-export const vkObj = `{
+
+
+
+export const vkJSON = `{
 	"protocol": "groth16",
 	"curve": "bn128",
 	"nPublic": 1,
@@ -93,6 +97,11 @@ export const vkObj = `{
 		]
 	]
 }`
+
+export const processVk: VerifyingKey = VerifyingKey.fromJSON(vkJSON)
+
+export const processVkAsContractParams = processVk.asContractParam();
+
 
 export const vkArray = [["20491192805390485299153009773594534940189261866228447918068658471970481763042",
 "9383485363053290200918347156157836566562967994039712273449902621266178545958"],
