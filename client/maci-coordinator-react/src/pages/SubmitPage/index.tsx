@@ -8,20 +8,11 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import { useContractRead } from 'wagmi';
 
-import {VerifyingKey} from '../../snarkjs-groth16-utils'
+import {CoordinatorOutput, VerifyingKey} from '../../snarkjs-groth16-utils'
 import { verifierContractABI } from './verifierContractABI';
-import { vkJSON } from './vks';
+import  vkPM from '../../snarkjs-groth16-utils/data/vk_processMessages-6-8-2-3.json'
+import proofPM from '../../snarkjs-groth16-utils/data/proof_processMessages-6-8-2-3.json'
 
-export const myProof: BigInt[] = [
-	BigInt("20776610477887446815273078353492765146630950893754290483106965963129184484201"),
-	BigInt("20361705172705744303670075571916655888523410733801205089874915044387567682743"),
-	BigInt("17389678848279063996173375881166939098239202813854548829882014432716092398334"),
-	BigInt("17426197184151128999906962307999891337688037397387297609583638954535393586735"),
-	BigInt("18815443775003060680231326273871977473225534307022727513514139122135612426509"),
-	BigInt("1013820286085527856549788085986156916790548419305218446388370822384113344741"),
-	BigInt("16682165190010025012222900500298529354050778179356771675155890688392737175543"),
-	BigInt("20538042432207684220272328471113780649647617726850422541845213393797044820505"),
-  ]
 
 
 export const myPublicInput: BigInt =
@@ -36,11 +27,13 @@ BigInt("147044096310809023560352379304114030391204456567156902679162962267038663
 // SubmitPage will call verifier contract of Ethereum
 const SubmitPage: React.FC<React.PropsWithChildren<{}>> = () => {
 
-
 	console.log("------trying to generate correct calldata of verifier contract-----")
 
-	const processVk: VerifyingKey = VerifyingKey.fromJSON(vkJSON)
-	console.log("print domainobj: ", processVk.asContractParam());
+	const coordinatorServiceOutput: CoordinatorOutput = CoordinatorOutput.fromJSON(JSON.stringify(proofPM));
+	const params = coordinatorServiceOutput.asContractParam();
+	const processVk: VerifyingKey = VerifyingKey.fromJSON(JSON.stringify(vkPM));
+
+
 
 	console.log("------SubmitPage mounted-----")
 	// it hooks into the context(state variables)
@@ -60,7 +53,7 @@ const SubmitPage: React.FC<React.PropsWithChildren<{}>> = () => {
 		address: verifierContractAddress,
 		abi: verifierContractABI,
 		functionName: 'verify',
-		args: [myProof, processVk.asContractParam(), myPublicInput],
+		args: [params.proof, processVk.asContractParam(), params.publicSignals],
 		onSuccess: (data) => {
 			// setVerifyProofData(data);
 			setVerifyProofLoading(false);
