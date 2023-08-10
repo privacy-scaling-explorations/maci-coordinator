@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	"github.com/iden3/go-rapidsnark/prover"
@@ -47,6 +48,12 @@ const (
 
 func NewRouter(p Prover) *gin.Engine {
 	r := gin.Default()
+
+	// This configures the middleware to allow all origins:
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+
+	r.Use(cors.New(config))
 
 	r.POST("/api/generateProof", p.GenerateProof)
 	r.GET("/api/getResult", p.GetResult)
