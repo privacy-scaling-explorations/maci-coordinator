@@ -1,0 +1,13 @@
+{
+    "circuits":
+        [
+            {
+                "circuitName": "processMessages_6-8-2-3",
+                "proofIds": [ 0, 1 ]
+            },
+            {
+                "circuitName": "tallyVotes_6-2-3",
+                "proofIds": [ 0, 1 ]
+            }
+        ]
+}

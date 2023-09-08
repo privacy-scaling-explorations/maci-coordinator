@@ -1,0 +1,5 @@
+{
+    "circuitName": "tallyVotes_6-2-3",
+    "zKeyURL": "https://maci-staging-ceremony-pse-p0tion-staging.s3.eu-central-1.amazonaws.com/circuits/tallyvotes_6-2-3/contributions/tallyvotes_6-2-3_final.zkey",
+    "wasmURL": "https://maci-staging-ceremony-pse-p0tion-staging.s3.eu-central-1.amazonaws.com/circuits/tallyvotes_6-2-3/tallyvotes_6-2-3.wasm"
+}
