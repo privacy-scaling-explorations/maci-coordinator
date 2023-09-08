@@ -1,0 +1,7 @@
+{
+    "circuitName": "multiplier2",
+    "circuitInput": {
+        "in1": "4",
+        "in2": "10"
+    }
+}

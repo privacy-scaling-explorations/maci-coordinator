@@ -7,32 +7,46 @@ import (
 	"github.com/privacy-scaling-explorations/maci-coordinator/src"
 )
 
+var sqlPassword string = os.Getenv("SQL_PASSWORD")
+var sqlUser string = os.Getenv("SQL_USER")
+var dbName string = os.Getenv("DB_NAME")
+
 func main() {
 	// These functions demonstrate two separate checks to detect if the code is being
 	// run inside a docker container in debug mode, or production mode!
-	//
+	
 	// Note: Valid only for docker containers generated using the Makefile command
 	firstCheck()
 	secondCheck()
 
-	prover := src.Prover{
-		ProcessMessagesCircuit: src.Circuit{
-			Result: src.Result{},
-			Status: src.WaitingForRequest,
-		},
-		TallyVotesCircuit: src.Circuit{
-			Result: src.Result{},
-			Status: src.WaitingForRequest,
-		},
+	// 
+	adminJWT, err := src.CreateJWT("admin", "admin")
+	if err != nil {
+		panic("Failed to create admin JWT")
 	}
 
-	r := src.NewRouter(prover)
-	r.LoadHTMLFiles("demo/api_demo.html")
+	// @note only for testing purposes
+	// to be refactored with a middleware for auth or other methods 
+	// of protecting the admin routes
+	fmt.Println("Admin JWT: " + adminJWT)
 
-	// listen and serve on localhost:8080
-	if err := r.Run(); err != nil {
+	// create prover object
+	prover := src.Prover{}
+	// init the db
+	prover.InitDb(sqlUser, sqlPassword, dbName)
+	// create a new router
+	r := src.NewRouter(prover)
+
+	certFile := "demo/server.crt"
+	keyFile := "demo/server.key"
+
+	// Listen and serve with TLS
+	if err := r.RunTLS("localhost:8080", certFile, keyFile); err != nil {
 		panic("Failed to run API server")
 	}
+
+	// make sure to close the DB connection
+	defer prover.CloseDB()
 }
 
 func firstCheck() bool {

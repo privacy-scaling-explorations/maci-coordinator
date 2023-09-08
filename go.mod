@@ -12,8 +12,11 @@ require (
 )
 
 require (
+	github.com/gin-contrib/cors v1.4.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/iden3/go-rapidsnark/types v0.0.2 // indirect
 	github.com/iden3/wasmer-go v0.0.1 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 )
 
