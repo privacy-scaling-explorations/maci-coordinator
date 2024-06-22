@@ -8,11 +8,11 @@ go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/iden3/go-rapidsnark/prover v0.0.10
+	github.com/iden3/go-rapidsnark/prover v0.0.11
 )
 
 require (
-	github.com/iden3/go-rapidsnark/types v0.0.2 // indirect
+	github.com/iden3/go-rapidsnark/types v0.0.3 // indirect
 	github.com/iden3/wasmer-go v0.0.1 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 )
